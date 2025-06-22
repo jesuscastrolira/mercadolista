@@ -24,6 +24,7 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Future<void> _refreshLists() async {
+    // Esta inicialización es necesaria para formatear fechas.
     await initializeDateFormatting('es_ES', null);
     final prefs = await SharedPreferences.getInstance();
     final List<String> savedListsJson = prefs.getStringList('shopping_lists') ?? [];
@@ -33,6 +34,7 @@ class _HistoryPageState extends State<HistoryPage> {
       return ShoppingList.fromJson(jsonMap);
     }).toList();
     
+    // Ordenamos las listas, mostrando las más nuevas primero.
     lists.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     
     if (mounted) {
@@ -43,20 +45,28 @@ class _HistoryPageState extends State<HistoryPage> {
     }
   }
 
-  Future<void> _deleteList(String id) async {
+  // --- NUEVA FUNCIÓN PARA ELIMINAR UNA LISTA ---
+  Future<void> _deleteList(String idToDelete) async {
     final prefs = await SharedPreferences.getInstance();
-    _shoppingLists.removeWhere((list) => list.id == id);
     
+    // Eliminamos la lista de nuestra variable de estado.
+    _shoppingLists.removeWhere((list) => list.id == idToDelete);
+    
+    // Convertimos la lista de objetos actualizada de nuevo a una lista de Strings en formato JSON.
     List<String> updatedListsJson = _shoppingLists.map((list) => jsonEncode(list.toJson())).toList();
+    
+    // Guardamos la lista de vuelta en SharedPreferences.
     await prefs.setStringList('shopping_lists', updatedListsJson);
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(backgroundColor: Colors.green, content: Text('La lista ha sido eliminada.')),
     );
     
+    // Actualizamos la interfaz de usuario.
     setState(() {});
   }
 
+  // --- NUEVO WIDGET: DIÁLOGO DE CONFIRMACIÓN DE BORRADO ---
   Future<bool?> _showDeleteConfirmationDialog() {
     return showDialog<bool>(
       context: context,
@@ -64,10 +74,16 @@ class _HistoryPageState extends State<HistoryPage> {
         return AlertDialog(
           backgroundColor: const Color(0xFF2a2a2a),
           title: const Text('Confirmar Eliminación'),
-          content: const Text('¿Estás seguro de que quieres eliminar esta lista?'),
+          content: const Text('¿Estás seguro de que quieres eliminar esta lista de forma permanente?'),
           actions: <Widget>[
-            TextButton(child: const Text('Cancelar'), onPressed: () => Navigator.of(context).pop(false)),
-            TextButton(child: const Text('Eliminar', style: TextStyle(color: Colors.redAccent)), onPressed: () => Navigator.of(context).pop(true)),
+            TextButton(
+              child: const Text('Cancelar', style: TextStyle(color: Colors.white70)),
+              onPressed: () => Navigator.of(context).pop(false), // Devuelve false si se cancela.
+            ),
+            TextButton(
+              child: const Text('Eliminar', style: TextStyle(color: Colors.redAccent)),
+              onPressed: () => Navigator.of(context).pop(true), // Devuelve true si se confirma.
+            ),
           ],
         );
       },
@@ -98,19 +114,32 @@ class _HistoryPageState extends State<HistoryPage> {
                     final currencySymbol = list.currency == 'Euros' ? '€' : '\$';
                     final DateFormat formatter = DateFormat('d \'de\' MMMM, y', 'es_ES');
                     
+                    // --- WIDGET DISMISSIBLE AÑADIDO ---
+                    // Este widget envuelve nuestra tarjeta y le da la capacidad de ser deslizada.
                     return Dismissible(
+                      // La 'key' es fundamental para que Flutter sepa qué elemento único eliminar de la lista.
                       key: Key(list.id),
-                      direction: DismissDirection.endToStart,
-                      confirmDismiss: (direction) => _showDeleteConfirmationDialog(),
+                      direction: DismissDirection.endToStart, // Solo permite deslizar de derecha a izquierda.
+                      
+                      // Muestra el diálogo de confirmación antes de hacer nada.
+                      confirmDismiss: (direction) async {
+                        return await _showDeleteConfirmationDialog();
+                      },
+
+                      // Esto se ejecuta solo si el usuario confirma en el diálogo.
                       onDismissed: (direction) {
                         _deleteList(list.id);
                       },
+                      
+                      // Este es el fondo rojo que aparece mientras se desliza.
                       background: Container(
                         color: Colors.redAccent,
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         alignment: Alignment.centerRight,
                         child: const Icon(Icons.delete_forever, color: Colors.white),
                       ),
+                      
+                      // Este es el contenido que siempre es visible: nuestra tarjeta.
                       child: Card(
                         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         color: const Color(0xFF2a2a2a),
