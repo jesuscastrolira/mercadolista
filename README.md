@@ -1,16 +1,26 @@
-# mercadolista
+# mercadolista - Desarrollado con IA - Developed with AI.
 
-A new Flutter project.
+Una aplicación de listas de compras simple y minimalista, creada con Flutter. Permite crear listas, añadir productos con cantidad y monto, y consultar un historial de compras pasadas. Ideal para organizar tus visitas al mercado de forma rápida y eficiente.
 
-## Getting Started
+Características principales:
 
-This project is a starting point for a Flutter application.
+Creación de Listas: Inicia una nueva lista de compras especificando tu nombre y la moneda (Euros o Dólares).
 
-A few resources to get you started if this is your first Flutter project:
+Gestión de Productos: Añade productos fácilmente, indicando cantidad y precio unitario.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Cálculo en Tiempo Real: Visualiza el coste total de tu compra mientras añades artículos.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Historial Persistente: Todas tus listas se guardan localmente para que puedas consultarlas y reutilizarlas en el futuro.
+
+--------------------------------------------------------------------------------------------------------------------------
+A simple and minimalist shopping list application built with Flutter. It allows users to create lists, add products with quantity and amount, and review a history of past shopping trips. Perfect for organizing your grocery runs quickly and efficiently.
+
+Key Features:
+
+List Creation: Start a new shopping list by specifying your name and preferred currency (Euros or Dollars).
+
+Product Management: Easily add products, indicating quantity and unit price.
+
+Real-Time Calculation: See the total cost of your purchase update in real-time as you add items.
+
+Persistent History: All your lists are saved locally, allowing you to review and reuse them in the future.
